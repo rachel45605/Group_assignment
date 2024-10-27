@@ -52,6 +52,9 @@ def index():
 def dashboard():
     return render_template('homepage.html')
 
+# Hardcoded API key for testing
+HARD_CODED_API_KEY = "AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg"
+
 @app.route("/financial_planning", methods=["GET", "POST"])
 def financial_planning():
     if request.method == "POST":
@@ -69,24 +72,30 @@ def financial_planning():
                     f"with an annual income of {annual_income}, total assets of {total_assets}, "
                     f"risk level of {risk_level}, investment horizon of {investment_horizon}, "
                     f"and interested in {', '.join(portfolios)}, what investment advice can you provide?")
+        
+        # Log the generated question for debugging
+        app.logger.debug(f"Generated question: {question}")
 
-        # Retrieve API key from session
-        api_key = session.get('api_key')
-
-        if not api_key:
-            flash('API key is missing. Please enter your API key first.')
-            return redirect(url_for('financial_planning'))
-
+        # Use the hardcoded API key directly
+        api_key = HARD_CODED_API_KEY
+        
         try:
-            # Configure the Gemini API with the API key stored in session
-            genai.configure(api_key="AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg")
+            # Configure the Gemini API with the hardcoded API key
+            genai.configure(api_key=api_key)  # Use the hardcoded API key
             model = genai.GenerativeModel("gemini-1.5-flash")
 
             # Generate advice using the AI model
             response = model.generate_content(question)
+            # Check if the response is valid
+            if not response or not hasattr(response, 'text'):
+                flash("Failed to retrieve advice. The response was not valid.")
+                app.logger.error("Invalid response received from Gemini API.")
+                return redirect(url_for('financial_planning'))
+
             advice = response.text  # Adjust based on the actual response structure of Gemini API
 
-            # Redirect to the advice display page with the generated advice
+            # Log the generated advice for debugging
+            app.logger.debug(f"Generated advice: {advice}")
             return render_template("advice.html", r=advice)
 
         except Exception as e:
