@@ -11,9 +11,9 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Configure the AI model
-api = os.getenv("MAKERSUITE_API_KEY")
-genai.configure(api_key='AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg')
-model = genai.GenerativeModel("gemini-1.5-flash")
+# api = os.getenv("MAKERSUITE_API_KEY")
+# genai.configure(api_key='AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg')
+# model = genai.GenerativeModel("gemini-1.5-flash")
 
 db = SQLAlchemy(app)
 
@@ -61,20 +61,39 @@ def financial_planning():
         risk_level = request.form.get("risk_level")
         investment_horizon = request.form.get("investment_horizon")
         portfolios = request.form.getlist("portfolios[]")
-        
+
         # Create a question for the AI model based on user inputs
         question = (f"Based on a user who is {age} years old, {gender}, "
                     f"with an annual income of {annual_income}, total assets of {total_assets}, "
                     f"risk level of {risk_level}, investment horizon of {investment_horizon}, "
                     f"and interested in {', '.join(portfolios)}, what investment advice can you provide?")
-        
-        # Generate advice using the AI model
-        advice = model.generate_content(question)
 
-        # Redirect to the advice display page with the generated advice
-        return render_template("advice.html", r=advice.text)
+        # Retrieve API key from session
+        api_key = session.get('api_key')
+
+        if not api_key:
+            flash('API key is missing. Please enter your API key first.')
+            return redirect(url_for('financial_planning'))
+
+        try:
+            # Configure the Gemini API with the API key stored in session
+            genai.configure(api_key="AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg")
+            model = genai.GenerativeModel("gemini-1.5-flash")
+
+            # Generate advice using the AI model
+            response = model.generate_content(question)
+            advice = response.text  # Adjust based on the actual response structure of Gemini API
+
+            # Redirect to the advice display page with the generated advice
+            return render_template("advice.html", r=advice)
+
+        except Exception as e:
+            flash(f"An error occurred: {e}")
+            return redirect(url_for('financial_planning'))
 
     return render_template("financial_planning.html")
+
+
 
 # @app.route('/financial-planning', methods=['GET', 'POST'])
 # def financial_planning():
