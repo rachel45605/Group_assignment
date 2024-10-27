@@ -8,8 +8,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 # app.config['SECRET_KEY'] = 'your-secret-key-here'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Configure the AI model
 api = os.getenv("MAKERSUITE_API_KEY")
 genai.configure(api_key='AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg')
