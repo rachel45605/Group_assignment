@@ -42,9 +42,11 @@
                         <i data-lucide="home"></i>
                         <span>Dashboard</span>
                     </li>
-                    <li class="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <i data-lucide="pie-chart"></i>
-                        <span>Financial Planning</span>
+                    <li class="flex items-center space-x-3 p-3 {{ 'bg-blue-50 text-blue-600' if request.path == url_for('financial_planning') else 'hover:bg-gray-50' }} rounded-lg cursor-pointer">
+                        <a href="{{ url_for('financial_planning') }}" class="flex items-center space-x-3">
+                            <i data-lucide="pie-chart"></i>
+                            <span>Financial Planning</span>
+                        </a>
                     </li>
                     <li class="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
                         <i data-lucide="wallet"></i>
