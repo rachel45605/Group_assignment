@@ -5,7 +5,15 @@ import google.generativeai as genai
 import os
 from datetime import datetime
 import os
+import logging
+import sys
 
+# Configure logging to show in console
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
 
 app = Flask(__name__)
@@ -66,21 +74,48 @@ def dashboard():
 @app.route("/financial_planning", methods=["GET", "POST"])
 def financial_planning():
     if request.method == "POST":
+        # Debug Step 1: Print raw form data
+        print("\n==== Raw Form Data ====")
+        print("Form Data:", request.form)
+        
         try:
-            # Configure Gemini AI
-            genai.configure(api_key="AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg")  # Replace with your API key
-            model = genai.GenerativeModel("gemini-pro")
-
-            # Get form data
+            # Debug Step 2: Extract form data with explicit error checking
+            print("\n==== Extracting Form Data ====")
+            
+            # Get form data with validation
             age = request.form.get("age")
             gender = request.form.get("gender")
             annual_income = request.form.get("annual_income")
             total_assets = request.form.get("total_assets")
-            risk_level = request.form.get("risk_level")
-            investment_horizon = request.form.get("investment_horizon")
-            portfolios = request.form.getlist("portfolios[]")
+            
+            print(f"Age: {age}, type: {type(age)}")
+            print(f"Gender: {gender}, type: {type(gender)}")
+            print(f"Annual Income: {annual_income}, type: {type(annual_income)}")
+            print(f"Total Assets: {total_assets}, type: {type(total_assets)}")
 
-            # Create the prompt
+            # Validate all required fields are present
+            if not all([age, gender, annual_income, total_assets]):
+                missing_fields = []
+                if not age: missing_fields.append("age")
+                if not gender: missing_fields.append("gender")
+                if not annual_income: missing_fields.append("annual income")
+                if not total_assets: missing_fields.append("total assets")
+                error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+                print(f"Validation Error: {error_msg}")
+                return render_template("advice.html", r=error_msg)
+
+            # Debug Step 3: Configure API
+            print("\n==== API Configuration ====")
+            api_key = "AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg"  # Replace with your actual key
+            if not api_key:
+                print("Error: No API key provided")
+                return render_template("advice.html", r="API key is missing")
+            
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel("gemini-pro")
+            print("API configured successfully")
+
+            # Debug Step 4: Create prompt
             prompt = f"""
             As a financial advisor, provide specific investment advice for an investor with the following profile:
 
@@ -92,33 +127,41 @@ def financial_planning():
             - Annual Income: ${annual_income}
             - Total Assets: ${total_assets}
 
-            Investment Preferences:
-            - Risk Tolerance: {risk_level}
-            - Investment Horizon: {investment_horizon}
-            - Interested Portfolios: {', '.join(portfolios)}
-
             Please provide:
-            1. Asset allocation recommendation
-            2. Specific investment suggestions based on their risk level
+            1. Asset allocation recommendation based on age and financial status
+            2. Specific investment suggestions considering the financial profile
             3. Timeline-based investment strategy
-            4. Key considerations and risks
+            4. Risk considerations and diversification advice
             """
 
+            print("\n==== Generated Prompt ====")
+            print(prompt)
+
+            # Debug Step 5: Generate response
+            print("\n==== Generating Response ====")
             try:
-                # Generate response
                 response = model.generate_content(prompt)
+                print("Response received from API")
+                
                 if response and hasattr(response, 'text'):
-                    return render_template("advice.html", r=response.text)
+                    advice_text = response.text
+                    print(f"Generated text length: {len(advice_text)}")
+                    print("First 100 characters:", advice_text[:100])
+                    return render_template("advice.html", r=advice_text)
                 else:
-                    return render_template("advice.html", r="Sorry, couldn't generate advice at this time.")
-            
+                    error_msg = "Invalid response format from API"
+                    print(f"Error: {error_msg}")
+                    return render_template("advice.html", r=error_msg)
+                
             except Exception as e:
-                app.logger.error(f"Error generating advice: {str(e)}")
-                return render_template("advice.html", r=f"Error generating advice: {str(e)}")
+                error_msg = f"Error generating content: {str(e)}"
+                print(f"Generation Error: {error_msg}")
+                return render_template("advice.html", r=error_msg)
 
         except Exception as e:
-            app.logger.error(f"Error in financial_planning: {str(e)}")
-            return render_template("advice.html", r=f"An error occurred: {str(e)}")
+            error_msg = f"Server error: {str(e)}"
+            print(f"Server Error: {error_msg}")
+            return render_template("advice.html", r=error_msg)
 
     # GET request - show the form
     return render_template("financial_planning.html")
