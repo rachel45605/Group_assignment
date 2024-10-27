@@ -149,16 +149,26 @@
             $('#financialPlanningForm').on('submit', function(e) {
                 e.preventDefault();
                 
+                // Show loading state
+                $('#adviceText').text('Generating advice...');
+                $('#adviceOutput').removeClass('hidden');
+                
                 $.ajax({
                     url: '{{ url_for("financial_planning") }}',
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#adviceOutput').removeClass('hidden');
-                        $('#adviceText').text(response.advice);
+                        if (response.advice) {
+                            // Format the text to preserve newlines
+                            const formattedAdvice = response.advice.replace(/\n/g, '<br>');
+                            $('#adviceText').html(formattedAdvice);
+                            $('#adviceOutput').removeClass('hidden');
+                        } else {
+                            $('#adviceText').html('No advice generated. Please try again.');
+                        }
                     },
                     error: function(xhr, status, error) {
-                        alert('Error generating advice: ' + error);
+                        $('#adviceText').html('Error generating advice: ' + error);
                     }
                 });
             });

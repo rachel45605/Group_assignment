@@ -1,31 +1,7 @@
-<!-- advice.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Financial Advice</title>
-    <style>
-        .advice-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .advice-text {
-            white-space: pre-line;  /* This preserves formatting */
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="advice-container">
-        <h1>Your Financial Advice</h1>
-        <div class="advice-text">
-            {% if advice %}
-                {{ advice|safe }}
-            {% else %}
-                <p>No advice available at this time.</p>
-            {% endif %}
-        </div>
+<!-- Advice Output -->
+<div id="adviceOutput" class="mt-8 hidden">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Your Personalized Financial Advice</h3>
+    <div class="bg-blue-50 rounded-lg p-4">
+        <div id="adviceText" class="prose max-w-none"></div>
     </div>
-</body>
-</html>
+</div>

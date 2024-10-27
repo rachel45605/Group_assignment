@@ -144,20 +144,19 @@ def financial_planning():
             if response and hasattr(response, 'text'):
                 advice_text = response.text
                 print(f"Generated text length: {len(advice_text)}")
-                print("Full advice text:", advice_text)  # Add this line for debugging
+                print("Full advice text:", advice_text)
                 
-                # Ensure the text is properly formatted for HTML
-                advice_text = advice_text.replace('\n', '<br>')
-                return render_template("advice.html", advice=advice_text)  # Changed 'r' to 'advice'
+                # Return JSON response for AJAX
+                return jsonify({"advice": advice_text})
             else:
                 error_msg = "Invalid response format from API"
                 print(f"Error: {error_msg}")
-                return render_template("advice.html", advice=error_msg)
+                return jsonify({"advice": error_msg})
                 
         except Exception as e:
             error_msg = f"Server error: {str(e)}"
             print(f"Server Error: {error_msg}")
-            return render_template("advice.html", advice=error_msg)
+            return jsonify({"advice": error_msg})
 
     return render_template("financial_planning.html")
 
