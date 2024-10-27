@@ -17,6 +17,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # genai.configure(api_key='AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg')
 # model = genai.GenerativeModel("gemini-1.5-flash")
 
+@app.route('/set_api_key', methods=['POST'])
+def set_api_key():
+    api_key = request.form['api_key']
+    session['api_key'] = api_key  # Store API key in session
+    os.environ['API_KEY'] = api_key  # Set the environment variable dynamically
+    genai.configure(api_key=api_key)  # Configure Gemini API with the new key
+    return redirect(url_for('index'))
+
 db = SQLAlchemy(app)
 
 with app.app_context():
@@ -52,61 +60,72 @@ def index():
 def dashboard():
     return render_template('homepage.html')
 
-# Hardcoded API key for testing
-HARD_CODED_API_KEY = "AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg"
+# # Hardcoded API key for testing
+# HARD_CODED_API_KEY = "AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg"
 
 @app.route("/financial_planning", methods=["GET", "POST"])
 def financial_planning():
     if request.method == "POST":
-        # Get the form data
-        age = request.form.get("age")
-        gender = request.form.get("gender")
-        annual_income = request.form.get("annual_income")
-        total_assets = request.form.get("total_assets")
-        risk_level = request.form.get("risk_level")
-        investment_horizon = request.form.get("investment_horizon")
-        portfolios = request.form.getlist("portfolios[]")
-
-        # Create a question for the AI model based on user inputs
-        question = (f"Based on a user who is {age} years old, {gender}, "
-                    f"with an annual income of {annual_income}, total assets of {total_assets}, "
-                    f"risk level of {risk_level}, investment horizon of {investment_horizon}, "
-                    f"and interested in {', '.join(portfolios)}, what investment advice can you provide?")
-        
-        # Log the generated question for debugging
-        app.logger.debug(f"Generated question: {question}")
-
-        # Use the hardcoded API key directly
-        api_key = HARD_CODED_API_KEY
-        
         try:
-            # Configure the Gemini API with the hardcoded API key
-            genai.configure(api_key=api_key)  # Use the hardcoded API key
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            # Configure Gemini AI
+            genai.configure(api_key="AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg")  # Replace with your API key
+            model = genai.GenerativeModel("gemini-pro")
 
-            # Generate advice using the AI model
-            response = model.generate_content(question)
-            # Check if the response is valid
-            if not response or not hasattr(response, 'text'):
-                flash("Failed to retrieve advice. The response was not valid.")
-                app.logger.error("Invalid response received from Gemini API.")
-                return redirect(url_for('financial_planning'))
+            # Get form data
+            age = request.form.get("age")
+            gender = request.form.get("gender")
+            annual_income = request.form.get("annual_income")
+            total_assets = request.form.get("total_assets")
+            risk_level = request.form.get("risk_level")
+            investment_horizon = request.form.get("investment_horizon")
+            portfolios = request.form.getlist("portfolios[]")
 
-            advice = response.text  # Adjust based on the actual response structure of Gemini API
+            # Create the prompt
+            prompt = f"""
+            As a financial advisor, provide specific investment advice for an investor with the following profile:
 
-            # Log the generated advice for debugging
-            app.logger.debug(f"Generated advice: {advice}")
-            return render_template("advice.html", r=advice)
+            Demographics:
+            - Age: {age}
+            - Gender: {gender}
+
+            Financial Status:
+            - Annual Income: ${annual_income}
+            - Total Assets: ${total_assets}
+
+            Investment Preferences:
+            - Risk Tolerance: {risk_level}
+            - Investment Horizon: {investment_horizon}
+            - Interested Portfolios: {', '.join(portfolios)}
+
+            Please provide:
+            1. Asset allocation recommendation
+            2. Specific investment suggestions based on their risk level
+            3. Timeline-based investment strategy
+            4. Key considerations and risks
+            """
+
+            try:
+                # Generate response
+                response = model.generate_content(prompt)
+                if response and hasattr(response, 'text'):
+                    return render_template("advice.html", r=response.text)
+                else:
+                    return render_template("advice.html", r="Sorry, couldn't generate advice at this time.")
+            
+            except Exception as e:
+                app.logger.error(f"Error generating advice: {str(e)}")
+                return render_template("advice.html", r=f"Error generating advice: {str(e)}")
 
         except Exception as e:
-            flash(f"An error occurred: {e}")
-            return redirect(url_for('financial_planning'))
+            app.logger.error(f"Error in financial_planning: {str(e)}")
+            return render_template("advice.html", r=f"An error occurred: {str(e)}")
 
+    # GET request - show the form
     return render_template("financial_planning.html")
 
 @app.route("/advice")
 def advice():
-    advice_text = request.args.get('advice')  # Retrieve the advice from the query parameters
+    advice_text = request.args.get('r', 'No advice available.')
     return render_template("advice.html", r=advice_text)
 
 

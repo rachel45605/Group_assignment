@@ -4,10 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
 </head>
-<body>
-    <h1>Your Investment Advice</h1>
-    <p>{{ r }}</p>  <!-- Display the advice text passed from the route -->
-    <a href="{{ url_for('financial_planning') }}">Go back</a>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6">Your Investment Advice</h1>
+        
+        {% if error %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if r %}
+            <div class="prose max-w-none">
+                {{ r | safe }}
+            </div>
+        {% endif %}
+
+        <div class="mt-6">
+            <a href="{{ url_for('financial_planning') }}" 
+               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Go back to Financial Planning
+            </a>
+        </div>
+    </div>
 </body>
 </html>
