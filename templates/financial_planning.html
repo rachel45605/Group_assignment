@@ -83,7 +83,7 @@
 
                 <!-- Portfolio Selection -->
                 <div class="mt-8">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Investment Products</h3>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Select Interested Investment Products</h3>
                     <form method="POST" action="{{ url_for('financial_planning') }}">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- General Portfolios -->
@@ -129,8 +129,23 @@
                                     </div>
                                 </label>
                             </div>
+                            <!-- Get Advice Button -->
+                            <form action="{{ url_for('index') }}" method="get">
+                                <button type="submit" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    Get Advice
+                                </button>
+                            </form>
+                        </main>
+                    </div>
 
-            <!-- Advice Output -->
+                    <script>
+                        // Initialize Lucide icons
+                        lucide.createIcons();
+                    </script>
+                </body>
+                </html>
+
+            <!-- Advice Output
             <div id="adviceOutput" class="mt-8 hidden">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Your Personalized Financial Advice</h3>
                 <div class="bg-blue-50 rounded-lg p-4">
@@ -161,4 +176,4 @@
         });
     </script>
 </body>
-</html>
+</html> -->
