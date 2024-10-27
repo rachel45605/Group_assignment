@@ -84,44 +84,51 @@
                 <!-- Portfolio Selection -->
                 <div class="mt-8">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Investment Products</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="border rounded-lg p-4">
-                            <label class="flex items-start space-x-3">
-                                <input type="checkbox" name="portfolios[]" value="australian_reits" class="mt-1">
-                                <div>
-                                    <h4 class="font-medium">Australian REITs</h4>
-                                    <p class="text-sm text-gray-600">Risk: Moderate</p>
-                                    <p class="text-sm text-gray-600">Return: 6-8%</p>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="border rounded-lg p-4">
-                            <label class="flex items-start space-x-3">
-                                <input type="checkbox" name="portfolios[]" value="asia_tech" class="mt-1">
-                                <div>
-                                    <h4 class="font-medium">Asia Tech</h4>
-                                    <p class="text-sm text-gray-600">Risk: High</p>
-                                    <p class="text-sm text-gray-600">Return: 10-15%</p>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="border rounded-lg p-4">
-                            <label class="flex items-start space-x-3">
-                                <input type="checkbox" name="portfolios[]" value="china_growth" class="mt-1">
-                                <div>
-                                    <h4 class="font-medium">China Growth</h4>
-                                    <p class="text-sm text-gray-600">Risk: High</p>
-                                    <p class="text-sm text-gray-600">Return: 12-18%</p>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+                    <form method="POST" action="{{ url_for('financial_planning') }}">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- General Portfolios -->
+                            <div class="border rounded-lg p-4">
+                                <label class="flex items-start space-x-3">
+                                    <input type="checkbox" name="portfolios[]" value="retirement_funds" class="mt-1">
+                                    <div>
+                                        <h4 class="font-medium">Retirement Funds</h4>
+                                        <p class="text-sm text-gray-600">Risk: Low</p>
+                                        <p class="text-sm text-gray-600">Return: 4-6%</p>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <label class="flex items-start space-x-3">
+                                    <input type="checkbox" name="portfolios[]" value="sustainable_investments" class="mt-1">
+                                    <div>
+                                        <h4 class="font-medium">Sustainable Investments</h4>
+                                        <p class="text-sm text-gray-600">Risk: Moderate</p>
+                                        <p class="text-sm text-gray-600">Return: 5-7%</p>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <label class="flex items-start space-x-3">
+                                    <input type="checkbox" name="portfolios[]" value="index_funds" class="mt-1">
+                                    <div>
+                                        <h4 class="font-medium">Index Funds</h4>
+                                        <p class="text-sm text-gray-600">Risk: Low</p>
+                                        <p class="text-sm text-gray-600">Return: 6-8%</p>
+                                    </div>
+                                </label>
+                            </div>
 
-                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                    Get Financial Advice
-                </button>
-            </form>
+                            <!-- Exploration Option -->
+                            <div class="border rounded-lg p-4">
+                                <label class="flex items-start space-x-3">
+                                    <input type="checkbox" name="portfolios[]" value="open_to_explore" class="mt-1">
+                                    <div>
+                                        <h4 class="font-medium">Open to Explore</h4>
+                                        <p class="text-sm text-gray-600">Risk: Varies</p>
+                                        <p class="text-sm text-gray-600">Return: Varies</p>
+                                    </div>
+                                </label>
+                            </div>
 
             <!-- Advice Output -->
             <div id="adviceOutput" class="mt-8 hidden">
