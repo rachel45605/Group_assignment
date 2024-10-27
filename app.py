@@ -43,9 +43,7 @@ def index():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html')
+    return render_template('homepage.html')
 
 @app.route('/financial-planning', methods=['GET', 'POST'])
 def financial_planning():
