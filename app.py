@@ -4,10 +4,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import google.generativeai as genai
 import os
 from datetime import datetime
+import os
+
 
 
 app = Flask(__name__)
 # app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.secret_key = os.urandom(24)  # Generates a random secret key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Configure the AI model
