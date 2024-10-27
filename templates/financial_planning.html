@@ -85,7 +85,6 @@
                 <div class="mt-8">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Select Interested Investment Products</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- General Portfolios -->
                         <div class="border rounded-lg p-4">
                             <label class="flex items-start space-x-3">
                                 <input type="checkbox" name="portfolios[]" value="retirement_funds" class="mt-1">
@@ -134,54 +133,8 @@
                     Get Advice
                 </button>
             </form>
-        </div>
-    </div>
 
-    <script>
-        $(document).ready(function() {
-            $('#financialPlanningForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                $.ajax({
-                    url: '{{ url_for("financial_planning") }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        // Redirect to the advice page with the generated advice
-                        window.location.href = '/advice?advice=' + encodeURIComponent(response.advice);
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error generating advice: ' + error);
-                    }
-                });
-            });
-        });
-    </script>
-</body>
-</html>
-
-
-
-
-
-
-
-                            <!-- Get Advice Button
-                            <a href="/advice" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                                Get Advice
-                            </a>
-                            </form>
-                        </main>
-                    </div>
-
-                    <script>
-                        // Initialize Lucide icons
-                        lucide.createIcons();
-                    </script>
-                </body>
-                </html> -->
-
-            <!-- Advice Output
+            <!-- Advice Output -->
             <div id="adviceOutput" class="mt-8 hidden">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Your Personalized Financial Advice</h3>
                 <div class="bg-blue-50 rounded-lg p-4">
@@ -212,4 +165,4 @@
         });
     </script>
 </body>
-</html> -->
+</html>

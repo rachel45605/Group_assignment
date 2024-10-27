@@ -1,7 +1,13 @@
-<!-- templates/advice.html -->
-<h2>Investment Advice</h2>
-<h4>{{ r }}</h4>
-
-<form action="/financial_planning" method="get">
-    <input type="submit" value="Main">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advice</title>
+</head>
+<body>
+    <h1>Your Investment Advice</h1>
+    <p>{{ r }}</p>  <!-- Display the advice text passed from the route -->
+    <a href="{{ url_for('financial_planning') }}">Go back</a>
+</body>
+</html>

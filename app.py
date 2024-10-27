@@ -104,6 +104,10 @@ def financial_planning():
 
     return render_template("financial_planning.html")
 
+@app.route("/advice")
+def advice():
+    advice_text = request.args.get('advice')  # Retrieve the advice from the query parameters
+    return render_template("advice.html", r=advice_text)
 
 
 # @app.route('/financial-planning', methods=['GET', 'POST'])
