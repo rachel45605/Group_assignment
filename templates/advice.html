@@ -1,58 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advice - RegionalBank</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
-</head>
-<body class="min-h-screen bg-gray-50">
-    <!-- Top Navigation Bar -->
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <h1 class="text-2xl font-bold">RegionalBank</h1>
-            </div>
-            <div class="flex items-center space-x-6">
-                <button class="p-2 hover:bg-blue-700 rounded-full">
-                    <i data-lucide="bell"></i>
-                </button>
-                <button class="p-2 hover:bg-blue-700 rounded-full">
-                    <i data-lucide="message-square"></i>
-                </button>
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="user"></i>
-                    <span>John Doe</span>
-                </div>
-                <button class="flex items-center space-x-2 hover:bg-blue-700 rounded-full p-2">
-                    <i data-lucide="log-out"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
+<!-- templates/advice.html -->
+<h2>Investment Advice</h2>
+<h4>{{ r }}</h4>
 
-    <!-- Main Content -->
-    <div class="flex max-w-7xl mx-auto mt-8 p-4">
-        <!-- Main Content Area (Advice) -->
-        <main class="flex-1 bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-2xl font-bold mb-6">Advice for Your Financial Planning</h2>
-            <p class="text-gray-600 mb-4">Here are some personalized financial tips and advice:</p>
-            <ul class="list-disc list-inside space-y-2 mb-4">
-                <li>Review your budget monthly to stay on track.</li>
-                <li>Consider diversifying your investments to minimize risk.</li>
-                <li>Make use of tax-advantaged accounts for savings.</li>
-                <li>Establish an emergency fund with at least 3-6 months of expenses.</li>
-            </ul>
-            <a href="/financial-planning" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Back to Financial Planning
-            </a>
-        </main>
-    </div>
-
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+<form action="/financial_planning" method="get">
+    <input type="submit" value="Main">
+</form>

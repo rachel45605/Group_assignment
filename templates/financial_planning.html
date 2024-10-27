@@ -26,7 +26,7 @@
         <div class="bg-white rounded-lg shadow-lg p-6">
             <h2 class="text-2xl font-bold mb-6">Financial Planning Portal</h2>
 
-            <form id="financialPlanningForm" class="space-y-6">
+            <form id="financialPlanningForm" method="POST" action="{{ url_for('financial_planning') }}" class="space-y-6">
                 <!-- Personal Information -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -84,52 +84,89 @@
                 <!-- Portfolio Selection -->
                 <div class="mt-8">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Select Interested Investment Products</h3>
-                    <form method="POST" action="{{ url_for('financial_planning') }}">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- General Portfolios -->
-                            <div class="border rounded-lg p-4">
-                                <label class="flex items-start space-x-3">
-                                    <input type="checkbox" name="portfolios[]" value="retirement_funds" class="mt-1">
-                                    <div>
-                                        <h4 class="font-medium">Retirement Funds</h4>
-                                        <p class="text-sm text-gray-600">Risk: Low</p>
-                                        <p class="text-sm text-gray-600">Return: 4-6%</p>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="border rounded-lg p-4">
-                                <label class="flex items-start space-x-3">
-                                    <input type="checkbox" name="portfolios[]" value="sustainable_investments" class="mt-1">
-                                    <div>
-                                        <h4 class="font-medium">Sustainable Investments</h4>
-                                        <p class="text-sm text-gray-600">Risk: Moderate</p>
-                                        <p class="text-sm text-gray-600">Return: 5-7%</p>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="border rounded-lg p-4">
-                                <label class="flex items-start space-x-3">
-                                    <input type="checkbox" name="portfolios[]" value="index_funds" class="mt-1">
-                                    <div>
-                                        <h4 class="font-medium">Index Funds</h4>
-                                        <p class="text-sm text-gray-600">Risk: Low</p>
-                                        <p class="text-sm text-gray-600">Return: 6-8%</p>
-                                    </div>
-                                </label>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- General Portfolios -->
+                        <div class="border rounded-lg p-4">
+                            <label class="flex items-start space-x-3">
+                                <input type="checkbox" name="portfolios[]" value="retirement_funds" class="mt-1">
+                                <div>
+                                    <h4 class="font-medium">Retirement Funds</h4>
+                                    <p class="text-sm text-gray-600">Risk: Low</p>
+                                    <p class="text-sm text-gray-600">Return: 4-6%</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="border rounded-lg p-4">
+                            <label class="flex items-start space-x-3">
+                                <input type="checkbox" name="portfolios[]" value="sustainable_investments" class="mt-1">
+                                <div>
+                                    <h4 class="font-medium">Sustainable Investments</h4>
+                                    <p class="text-sm text-gray-600">Risk: Moderate</p>
+                                    <p class="text-sm text-gray-600">Return: 5-7%</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="border rounded-lg p-4">
+                            <label class="flex items-start space-x-3">
+                                <input type="checkbox" name="portfolios[]" value="index_funds" class="mt-1">
+                                <div>
+                                    <h4 class="font-medium">Index Funds</h4>
+                                    <p class="text-sm text-gray-600">Risk: Low</p>
+                                    <p class="text-sm text-gray-600">Return: 6-8%</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="border rounded-lg p-4">
+                            <label class="flex items-start space-x-3">
+                                <input type="checkbox" name="portfolios[]" value="open_to_explore" class="mt-1">
+                                <div>
+                                    <h4 class="font-medium">Open to Explore</h4>
+                                    <p class="text-sm text-gray-600">Risk: Varies</p>
+                                    <p class="text-sm text-gray-600">Return: Varies</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
-                            <!-- Exploration Option -->
-                            <div class="border rounded-lg p-4">
-                                <label class="flex items-start space-x-3">
-                                    <input type="checkbox" name="portfolios[]" value="open_to_explore" class="mt-1">
-                                    <div>
-                                        <h4 class="font-medium">Open to Explore</h4>
-                                        <p class="text-sm text-gray-600">Risk: Varies</p>
-                                        <p class="text-sm text-gray-600">Return: Varies</p>
-                                    </div>
-                                </label>
-                            </div>
-                            <!-- Get Advice Button -->
+                <!-- Get Advice Button -->
+                <button type="submit" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    Get Advice
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#financialPlanningForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                $.ajax({
+                    url: '{{ url_for("financial_planning") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        // Redirect to the advice page with the generated advice
+                        window.location.href = '/advice?advice=' + encodeURIComponent(response.advice);
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error generating advice: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+                            <!-- Get Advice Button
                             <a href="/advice" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                                 Get Advice
                             </a>
@@ -142,7 +179,7 @@
                         lucide.createIcons();
                     </script>
                 </body>
-                </html>
+                </html> -->
 
             <!-- Advice Output
             <div id="adviceOutput" class="mt-8 hidden">

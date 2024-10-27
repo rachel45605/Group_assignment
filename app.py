@@ -6,9 +6,13 @@ from datetime import datetime
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SECRET_KEY'] = 'your-secret-key-here'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bank.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Configure the AI model
+api = os.getenv("MAKERSUITE_API_KEY")
+genai.configure(api_key='AIzaSyDtgxpFE0405T7m7l4llYVzW-eCb_Z-XMg')
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 db = SQLAlchemy(app)
 
@@ -45,94 +49,120 @@ def index():
 def dashboard():
     return render_template('homepage.html')
 
-@app.route('/financial-planning', methods=['GET', 'POST'])
+@app.route("/financial_planning", methods=["GET", "POST"])
 def financial_planning():
-    if request.method == 'POST':
-        # Get form data
-        user_id = session.get('user_id', 1)  # Default to 1 for testing
-        data = {
-            'age': request.form.get('age'),
-            'gender': request.form.get('gender'),
-            'annual_income': request.form.get('annual_income'),
-            'risk_level': request.form.get('risk_level'),
-            'investment_horizon': request.form.get('investment_horizon'),
-            'region': request.form.get('region'),
-            'total_assets': request.form.get('total_assets'),
-            'selected_portfolios': request.form.getlist('portfolios[]')
-        }
+    if request.method == "POST":
+        # Get the form data
+        age = request.form.get("age")
+        gender = request.form.get("gender")
+        annual_income = request.form.get("annual_income")
+        total_assets = request.form.get("total_assets")
+        risk_level = request.form.get("risk_level")
+        investment_horizon = request.form.get("investment_horizon")
+        portfolios = request.form.getlist("portfolios[]")
         
-        # Create new financial profile
-        profile = FinancialProfile(
-            user_id=user_id,
-            age=data['age'],
-            gender=data['gender'],
-            annual_income=float(data['annual_income']),
-            risk_level=data['risk_level'],
-            investment_horizon=data['investment_horizon'],
-            region=data['region'],
-            total_assets=float(data['total_assets']),
-            selected_portfolios=','.join(data['selected_portfolios'])
-        )
+        # Create a question for the AI model based on user inputs
+        question = (f"Based on a user who is {age} years old, {gender}, "
+                    f"with an annual income of {annual_income}, total assets of {total_assets}, "
+                    f"risk level of {risk_level}, investment horizon of {investment_horizon}, "
+                    f"and interested in {', '.join(portfolios)}, what investment advice can you provide?")
         
-        try:
-            db.session.add(profile)
-            db.session.commit()
-            
-            # Generate advice based on profile
-            advice = generate_financial_advice(data)
-            return jsonify({
-                'status': 'success',
-                'advice': advice
-            })
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({
-                'status': 'error',
-                'message': str(e)
-            }), 500
-    
-    # For GET request, render the form
-    return render_template('financial_planning.html')
+        # Generate advice using the AI model
+        advice = model.generate_content(question)
 
-def generate_financial_advice(data):
-    # Simple advice generation based on risk level and investment horizon
-    risk_level = data['risk_level']
-    horizon = data['investment_horizon']
-    income = float(data['annual_income'])
+        # Redirect to the advice display page with the generated advice
+        return render_template("advice.html", r=advice.text)
+
+    return render_template("financial_planning.html")
+
+# @app.route('/financial-planning', methods=['GET', 'POST'])
+# def financial_planning():
+#     if request.method == 'POST':
+#         # Get form data
+#         user_id = session.get('user_id', 1)  # Default to 1 for testing
+#         data = {
+#             'age': request.form.get('age'),
+#             'gender': request.form.get('gender'),
+#             'annual_income': request.form.get('annual_income'),
+#             'risk_level': request.form.get('risk_level'),
+#             'investment_horizon': request.form.get('investment_horizon'),
+#             'region': request.form.get('region'),
+#             'total_assets': request.form.get('total_assets'),
+#             'selected_portfolios': request.form.getlist('portfolios[]')
+#         }
+        
+#         # Create new financial profile
+#         profile = FinancialProfile(
+#             user_id=user_id,
+#             age=data['age'],
+#             gender=data['gender'],
+#             annual_income=float(data['annual_income']),
+#             risk_level=data['risk_level'],
+#             investment_horizon=data['investment_horizon'],
+#             region=data['region'],
+#             total_assets=float(data['total_assets']),
+#             selected_portfolios=','.join(data['selected_portfolios'])
+#         )
+        
+#         try:
+#             db.session.add(profile)
+#             db.session.commit()
+            
+#             # Generate advice based on profile
+#             advice = generate_financial_advice(data)
+#             return jsonify({
+#                 'status': 'success',
+#                 'advice': advice
+#             })
+#         except Exception as e:
+#             db.session.rollback()
+#             return jsonify({
+#                 'status': 'error',
+#                 'message': str(e)
+#             }), 500
     
-    advice = f"""
-    Based on your profile:
+#     # For GET request, render the form
+#     return render_template('financial_planning.html')
+
+# def generate_financial_advice(data):
+#     # Simple advice generation based on risk level and investment horizon
+#     risk_level = data['risk_level']
+#     horizon = data['investment_horizon']
+#     income = float(data['annual_income'])
     
-    1. Investment Strategy:
-    - Risk Profile: {risk_level.capitalize()}
-    - Time Horizon: {horizon.capitalize()}
-    - Recommended Monthly Investment: ${round(income * 0.2 / 12, 2)}
+#     advice = f"""
+#     Based on your profile:
     
-    2. Portfolio Recommendations:
-    """
+#     1. Investment Strategy:
+#     - Risk Profile: {risk_level.capitalize()}
+#     - Time Horizon: {horizon.capitalize()}
+#     - Recommended Monthly Investment: ${round(income * 0.2 / 12, 2)}
     
-    if risk_level == 'conservative':
-        advice += """
-    - 60% Global Bonds
-    - 30% Blue-chip stocks
-    - 10% Cash equivalents
-        """
-    elif risk_level == 'moderate':
-        advice += """
-    - 40% Growth stocks
-    - 30% Value stocks
-    - 20% Bonds
-    - 10% REITs
-        """
-    else:  # aggressive
-        advice += """
-    - 50% Growth stocks
-    - 30% Emerging markets
-    - 15% Tech sector
-    - 5% Crypto/High-risk assets
-        """
+#     2. Portfolio Recommendations:
+#     """
     
-    return advice
+#     if risk_level == 'conservative':
+#         advice += """
+#     - 60% Global Bonds
+#     - 30% Blue-chip stocks
+#     - 10% Cash equivalents
+#         """
+#     elif risk_level == 'moderate':
+#         advice += """
+#     - 40% Growth stocks
+#     - 30% Value stocks
+#     - 20% Bonds
+#     - 10% REITs
+#         """
+#     else:  # aggressive
+#         advice += """
+#     - 50% Growth stocks
+#     - 30% Emerging markets
+#     - 15% Tech sector
+#     - 5% Crypto/High-risk assets
+#         """
+    
+#     return advice
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -176,11 +206,26 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('index'))
 
-@app.route('/advice')
-def advice():
-    return render_template('advice.html')
+# @app.route('/advice', methods=['POST'])
+# def advice():
+#     # Get data from the form submission
+#     age = request.form.get('age')
+#     gender = request.form.get('gender')
+#     annual_income = request.form.get('annual_income')
+#     total_assets = request.form.get('total_assets')
+#     risk_level = request.form.get('risk_level')
+#     investment_horizon = request.form.get('investment_horizon')
+#     region = request.form.get('region')
+#     selected_portfolios = request.form.getlist('portfolios[]')
 
-# if __name__ == '__main__':
-#     with app.app_context():
-#         db.create_all()
-#     app.run(debug=True)
+#     # Here you would call your logic to generate advice based on the input
+#     advice_text = generate_advice(age, gender, annual_income, total_assets, risk_level, investment_horizon, region, selected_portfolios)
+
+#     return jsonify({'advice': advice_text})
+
+# def generate_advice(age, gender, annual_income, total_assets, risk_level, investment_horizon, region, selected_portfolios):
+#     # Placeholder logic for advice generation
+#     return f"Based on your profile:\n- Age: {age}\n- Gender: {gender}\n- Annual Income: {annual_income}\n- Total Assets: {total_assets}\n- Risk Level: {risk_level}\n- Investment Horizon: {investment_horizon}\n- Region: {region}\n- Selected Portfolios: {', '.join(selected_portfolios)}\n\nHere are your personalized investment strategies..."
+
+if __name__ == "__main__":
+    app.run(debug=True)
